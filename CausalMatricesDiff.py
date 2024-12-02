@@ -128,7 +128,7 @@ class CausalMatricesDiff:
             "# of undirected edges for pred_dag": total_pred,
         }
 
-    def structural_humming_distance(self) -> float:
+    def structural_hamming_distance(self) -> float:
         """
         Compute the structural Hamming distance between the true and predicted DAGs.
 
