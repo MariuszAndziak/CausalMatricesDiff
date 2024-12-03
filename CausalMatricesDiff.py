@@ -124,13 +124,13 @@ class CausalMatricesDiff:
                     total_pred += 0.5
 
         return {
-            "# of undirected edges for true_dag": total_true,
-            "# of undirected edges for pred_dag": total_pred,
+            "# of undirected edges for True DAG": total_true,
+            "# of undirected edges for Pred DAG": total_pred,
         }
 
     def structural_hamming_distance(self) -> float:
         """
-        Compute the structural Hamming distance between the true and predicted DAGs.
+        Compute the Structural Hamming Distance (SDH) between the True DAG and Pred DAG.
 
         Returns:
             float: The sum of absolute differences between the two DAGs.
