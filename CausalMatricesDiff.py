@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 from matplotlib.patches import Rectangle
+from matplotlib.lines import Line2D
 from typing import List, Optional, Tuple, Dict, Union
 
 warnings.filterwarnings("ignore")
@@ -53,11 +54,13 @@ class CausalMatricesDiff:
 
         return result_fn, result_fp
 
-    def causal_matrices_diff(
+    def plot_causal_matrices_diff(
         self,
         save_name: Optional[str] = None,
         figsize: Tuple[int, int] = (12, 6),
         cmap_name: str = "Greys",
+        show_only_one_plot = True,
+        show_legend = False
     ) -> None:
         """
         Visualize the differences between the true and predicted DAG matrices.
@@ -66,15 +69,23 @@ class CausalMatricesDiff:
             save_name (Optional[str]): If provided, saves the plot to the specified file path.
             figsize (Tuple[int, int]): Figure size for the plot.
             cmap_name (str): Colormap to use for the heatmap.
+            show_only_one_plot (bool): Show only predicted DAG or also true DAG.
+            show_legend (bool): Show square color codes.
         """
         assert self.true_dag.shape[0] == len(
             self.var_names
         ), "Length of variable list doesn't match the shape of the causal matrix"
 
-        fig, ax = plt.subplots(ncols=2, figsize=figsize)
-        for n in range(2):
+        N = 1 if show_only_one_plot else 2
+
+        fig, ax = plt.subplots(ncols=N, figsize=figsize)
+
+        if N == 1:
+            ax = [ax]
+
+        for n in range(N):
             sns.heatmap(
-                self.true_dag if n == 0 else self.pred_dag,
+                self.pred_dag if n == 0 else self.true_dag,
                 cmap=cmap_name,
                 ax=ax[n],
                 cbar=False,
@@ -87,23 +98,39 @@ class CausalMatricesDiff:
             ax[n].set_yticklabels(self.var_names, rotation=0)
             ax[n].set_aspect("equal")
 
-        ax[0].set_title("True DAG")
-        ax[1].set_title("Pred DAG")
+        ax[0].set_title("Pred DAG")
+
+        if show_only_one_plot == False:
+            ax[1].set_title("True DAG")
 
         for j, i in self.fp_list:
-            ax[1].add_patch(
+            ax[0].add_patch(
                 Rectangle((i, j), 1, 1, linewidth=0, facecolor="#D3D3D3", edgecolor="k")
             )
 
         for j, i in self.fn_list:
-            ax[1].add_patch(
+            ax[0].add_patch(
                 Rectangle((i, j), 1, 1, linewidth=2, facecolor="white", edgecolor="k")
             )
+        
+        legend_handles = [
+    Line2D([0], [0], marker='s', color='black', markersize=10, label='Present in True DAG and Pred DAG', linestyle='None'),
+    Line2D([0], [0], marker='s', markerfacecolor='white', markeredgecolor='black', markersize=10, label='Present only in True DAG', linestyle='None'),
+    Line2D([0], [0], marker='s', color='#D3D3D3', markersize=10, label='Present only in Pred DAG', linestyle='None'),
+]
+
 
         if save_name is not None:
             fig.savefig(save_name)
         else:
             plt.tight_layout()
+            
+            if show_legend:
+                plt.legend(
+                    handles = legend_handles,
+                    loc='upper left',
+                    frameon=True
+                )
             plt.show()
 
     def number_of_undirected(self) -> Dict[str, float]:
@@ -153,6 +180,10 @@ class CausalMatricesDiff:
             str: A formatted string describing the differences.
         """
         report = []
+
+        if false_negatives == None and false_positives == None:
+            false_positives, false_negatives = self.get_not_equal()
+
         report.append("Pred DAG doesn't have causal paths from:")
         for elem in false_negatives:
             report.append(f"- {elem[0]} to {elem[1]}")
