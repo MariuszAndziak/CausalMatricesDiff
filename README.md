@@ -19,7 +19,6 @@ Implementation with custom variable names
 </p>
 
 ## **Example of usage** ##
-## **Example of usage** ##
 ```python
 true_dag = np.array(
     [
