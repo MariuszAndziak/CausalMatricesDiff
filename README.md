@@ -13,6 +13,12 @@ A textual report is also generated, detailing false positive and false negative 
   <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example.png" alt="Show differences in DAG structures">
 </p>
 
+Implementation with custom variable names
+<p align="center">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example2.png" alt="Show differences in DAG structures">
+</p>
+
+## **Example of usage** ##
 ## **Example of usage** ##
 ```python
 true_dag = np.array(

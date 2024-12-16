@@ -165,6 +165,19 @@ class CausalMatricesDiff:
         diff = np.abs(self.true_dag - self.pred_dag)
         return float(np.sum(diff))
     
+    def metrics(self) -> dict:
+        """
+        Bind metrics into one dictionary.
+
+        Returns:
+            dict: A dictionaty with all the metrics for easy access.
+
+        """
+        metrics = dict()
+        metrics['shd'] = self.structural_hamming_distance()
+        metrics['undir'] = self.number_of_undirected()
+        return metrics
+    
     def format_differences_report(self,
         false_negatives: List[List[str]], 
         false_positives: List[List[str]]
