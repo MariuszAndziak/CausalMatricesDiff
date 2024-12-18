@@ -83,6 +83,8 @@ class CausalMatricesDiff:
         if N == 1:
             ax = [ax]
 
+        plt.style.use('ggplot')
+
         for n in range(N):
             sns.heatmap(
                 self.pred_dag if n == 0 else self.true_dag,
@@ -179,8 +181,8 @@ class CausalMatricesDiff:
         return metrics
     
     def format_differences_report(self,
-        false_negatives: List[List[str]], 
-        false_positives: List[List[str]]
+        false_negatives: List[List[str]] = None, 
+        false_positives: List[List[str]] = None
     ) -> str:
         """
         Generate a formatted report of differences between true and predicted DAGs.

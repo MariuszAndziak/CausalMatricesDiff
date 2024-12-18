@@ -13,13 +13,10 @@ A textual report is also generated, detailing false positive and false negative 
   <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example.png" alt="Show differences in DAG structures">
 </p>
 
-Implementation with custom variable names
-<p align="center">
-  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example2.png" alt="Show differences in DAG structures">
-</p>
-
 ## **Example of usage** ##
 ```python
+from CausalMatricesDiff import CausalMatricesDiff as CMD
+
 true_dag = np.array(
     [
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -50,27 +47,37 @@ pred_dag = np.array(
     ]
 )
 
-var_names = [f"variable_{n}" for n in range(10)]
-matrices = CausalMatricesDiff(true_dag, pred_dag, var_names=var_names)
-matrices.causal_matrices_diff(save_name="example.png")
-print("* Number of undirected edges:", matrices.number_of_undirected())
-print("* Structural Hamming Distance:", matrices.structural_hamming_distance())
-print("* Listing of differences:")
-print(matrices.list_differences(return_text_description=True))
+names = ['Guinness', 'Whiskey', 'Katie', 'Cocoa', 'Harley', 'Scout', 'Chloe', 'Millie', 'Winnie', 'Wrigley']
+
+compare_matrices = CMD(true_dag=true_dag, pred_dag=pred_dag, var_names=names)
+
+compare_matrices.plot_causal_matrices_diff(show_legend=True)
+
+metrics = compare_matrices.metrics()
+
+print(compare_matrices.list_differences())
+print('#'*30)
+print('Structural Hamming Distance:' ,metrics['shd'])
+print(metrics['undir'])
 ```
 
+<p align="center">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example2.png" alt="Show differences in DAG structures">
+</p>
+
 ```
-* Number of undirected edges: {'# of undirected edges for True DAG': 0, '# of undirected edges for Pred DAG': 0}
-* Structural Hamming Distance: 6.0
-* Listing of differences:
 Pred DAG doesn't have causal paths from:
-- variable_2 to variable_7
+- Katie to Millie
 which are present in True DAG
 ------------------------------
 Pred DAG has additional causal paths from:
-- variable_1 to variable_7
-- variable_2 to variable_3
-- variable_3 to variable_4
-- variable_3 to variable_5
+- Guinness to Millie
+- Whiskey to Millie
+- Katie to Cocoa
+- Cocoa to Harley
+- Cocoa to Scout
 which are not present in True DAG
+##############################
+Structural Hamming Distance: 6.0
+{'# of undirected edges for True DAG': 0, '# of undirected edges for Pred DAG': 0}
 ```
