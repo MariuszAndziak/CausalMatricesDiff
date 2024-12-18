@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
 import seaborn as sns
 import warnings
 from matplotlib.patches import Rectangle
@@ -243,3 +244,78 @@ class CausalMatricesDiff:
                 "False Negatives": false_negatives_variables,
                 "False Positives": false_positives_variables,
             }
+    
+    def draw_dag(self, layout_num: int = -1) -> None:
+        """
+        Draws the Directed Acyclic Graph (DAG) with options for different layouts.
+        
+        Highlights false positives with red edges and uses black edges for all other connections.
+        Allows the user to select a specific layout or visualize the graph using all available layouts.
+
+        Parameters:
+        - layout_num (int): Specifies the layout to use. If set to -1, all layouts will be drawn sequentially.
+
+        Available Layouts:
+        0: Spring Layout (Force-directed)
+        1: Circular Layout
+        2: Kamada-Kawai Layout
+        3: Shell Layout
+        4: Spectral Layout
+        5: Planar Layout
+        6: Spiral Layout
+        7: Random Layout
+        """
+        # Define available layouts
+        layouts: Dict[int, callable] = {
+            0: nx.spring_layout,     # Force-directed layout
+            1: nx.circular_layout,   # Nodes arranged in a circle
+            2: nx.kamada_kawai_layout,  # Optimized force-directed layout
+            3: nx.shell_layout,      # Nodes in concentric shells
+            4: nx.spectral_layout,   # Based on graph Laplacian
+            5: nx.planar_layout,     # Non-overlapping edges (if planar)
+            6: nx.spiral_layout,     # Nodes arranged in a spiral
+            7: nx.random_layout      # Random node positions
+        }
+
+        # Get false positives and negatives from the DAG comparison
+        false_positives = self.list_differences(return_text_description=False)['False Positives']
+        false_negatives = self.list_differences(return_text_description=False)['False Negatives']
+
+        # Create a directed graph
+        G: nx.DiGraph = nx.DiGraph()
+        for i, row in enumerate(self.pred_dag):
+            for j, value in enumerate(row):
+                if value == 1:
+                    G.add_edge(self.var_names[i], self.var_names[j])  # Add edge based on prediction DAG
+
+        # Highlight false positives with red edges
+        red_edges: List[Tuple[str, str]] = []
+        for u, v in false_positives:
+            G.add_edge(u, v)  # Add edge for false positives
+            red_edges.append((u, v))
+
+        # Black edges for all other connections
+        black_edges = [edge for edge in G.edges if edge not in red_edges]
+
+        # If a specific layout is chosen, filter to that layout only
+        if layout_num != -1:
+            layouts = {layout_num: layouts[layout_num]}
+
+        # Draw the graph for each selected layout
+        for layout_number, layout in layouts.items():
+            pos = layout(G)  # Compute node positions
+
+            # Draw the graph
+            nx.draw(
+                G, pos, with_labels=True, node_size=2000, font_size=10, font_color='white'
+            )
+            # Draw black edges
+            nx.draw_networkx_edges(G, pos, edgelist=black_edges, edge_color='black')
+            # Draw red edges with increased width
+            nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='red', width=3)
+
+            # Add a title for the layout
+            if layout_num == -1:
+                plt.title(f"[{layout_number}] {layout.__name__}")
+            plt.show()
+
