@@ -319,7 +319,7 @@ class CausalMatricesDiff:
                 plt.title(f"[{layout_number}] {layout.__name__}")
             plt.show()
     
-    def legend_descriptions(show = 'both'):
+    def legend_descriptions(self, show = 'both'):
         descriptions = [
             '''
             Red edges are false positives - a path present in Pred DAG but absent in True DAG. \n
@@ -338,32 +338,42 @@ class CausalMatricesDiff:
         elif show == 'matrix':
             return descriptions[1]
         else:
-            '\n'.join(descriptions)
+            return '\n'.join(descriptions)
     
-    def calculate_match_percentage(self) -> float:
+    def calculate_match_percentage(self) -> dict:
         """
-        Calculates the percentage of how much the predicted DAG (pred_dag) matches the true DAG (true_dag)
-        using the Structural Hamming Distance (SHD).
+        Calculates the percentage of edges in the predicted DAG (pred_dag) that match the edges in 
+        the true DAG (true_dag) and the number of additional edges that are present in pred_dag,
+
+        Args:
+            true_dag (np.ndarray): The ground truth DAG as a binary adjacency matrix (n x n).
+            pred_dag (np.ndarray): The predicted DAG as a binary adjacency matrix (n x n).
 
         Returns:
-            float: The match percentage (0-100) indicating the similarity between pred_dag and true_dag.
+            dict: The match percentage (0-100) indicating the proportion of matched edges. 
+            The total number of false positives ini pred_dag.
         """
         if self.true_dag.shape != self.pred_dag.shape:
             raise ValueError("The true_dag and pred_dag must have the same dimensions.")
 
-        # Number of nodes
-        n_nodes = true_dag.shape[0]
+        # Total edges in the true DAG
+        total_true_edges = np.sum(self.true_dag)
 
-        # Calculate SHD (differences in edges)
-        shd = shd.structural_hamming_distance()  # Count edge mismatches (additions, deletions, reversals)
+        # Matched edges between true DAG and predicted DAG
+        matched_edges = np.sum((self.true_dag == 1) & (self.pred_dag == 1))
 
-        # Total possible edges in a DAG (excluding self-loops)
-        total_possible_edges = n_nodes * (n_nodes - 1)
+        # Avoid division by zero if the true DAG has no edges
+        if total_true_edges == 0:
+            return 100.0 if np.sum(self.pred_dag) == 0 else 0.0
 
         # Calculate the match percentage
-        match_percentage = 100 * (1 - shd / total_possible_edges)
-
-        return match_percentage
+        match_percentage = 100 * matched_edges / total_true_edges
+        
+        false_positives_len = len(self.list_differences(return_text_description=False)['False Positives'])
+        return {
+            'matched paths': match_percentage,
+            'additional paths': false_positives_len
+            }
 
 
 
