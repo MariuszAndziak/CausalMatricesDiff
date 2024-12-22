@@ -252,18 +252,18 @@ class CausalMatricesDiff:
         Highlights false positives with red edges and uses black edges for all other connections.
         Allows the user to select a specific layout or visualize the graph using all available layouts.
 
-        Parameters:
-        - layout_num (int): Specifies the layout to use. If set to -1, all layouts will be drawn sequentially.
+        Args:
+            layout_num (int): Specifies the layout to use. If set to -1, all layouts will be drawn sequentially.
 
-        Available Layouts:
-        0: Spring Layout (Force-directed)
-        1: Circular Layout
-        2: Kamada-Kawai Layout
-        3: Shell Layout
-        4: Spectral Layout
-        5: Planar Layout
-        6: Spiral Layout
-        7: Random Layout
+            Available Layouts:
+            0: Spring Layout (Force-directed)
+            1: Circular Layout
+            2: Kamada-Kawai Layout
+            3: Shell Layout
+            4: Spectral Layout
+            5: Planar Layout
+            6: Spiral Layout
+            7: Random Layout
         """
         # Define available layouts
         layouts: Dict[int, callable] = {
@@ -318,4 +318,53 @@ class CausalMatricesDiff:
             if layout_num == -1:
                 plt.title(f"[{layout_number}] {layout.__name__}")
             plt.show()
+    
+    def legend_descriptions(show = 'both'):
+        descriptions = [
+            '''
+            Red edges are false positives - a path present in Pred DAG but absent in True DAG. \n
+            Grey edges are false negatives - a path present in True DAG but absent in Pred DAG. \n
+            Black edges present matching paths in True DAG and Pred DAG.
+            ''',
+
+            '''
+            White squares represent a connections from variable in on the X axis to variable on Y axis only in True DAG.
+            Grey squares represent a connections from variable in on the X axis to variable on Y axis only in Pred DAG.
+            Black squares present a match in True DAG and Pred DAG.
+            '''
+        ]
+        if show == 'dag':
+            return descriptions[0]
+        elif show == 'matrix':
+            return descriptions[1]
+        else:
+            '\n'.join(descriptions)
+    
+    def calculate_match_percentage(self) -> float:
+        """
+        Calculates the percentage of how much the predicted DAG (pred_dag) matches the true DAG (true_dag)
+        using the Structural Hamming Distance (SHD).
+
+        Returns:
+            float: The match percentage (0-100) indicating the similarity between pred_dag and true_dag.
+        """
+        if self.true_dag.shape != self.pred_dag.shape:
+            raise ValueError("The true_dag and pred_dag must have the same dimensions.")
+
+        # Number of nodes
+        n_nodes = true_dag.shape[0]
+
+        # Calculate SHD (differences in edges)
+        shd = shd.structural_hamming_distance()  # Count edge mismatches (additions, deletions, reversals)
+
+        # Total possible edges in a DAG (excluding self-loops)
+        total_possible_edges = n_nodes * (n_nodes - 1)
+
+        # Calculate the match percentage
+        match_percentage = 100 * (1 - shd / total_possible_edges)
+
+        return match_percentage
+
+
+
 
