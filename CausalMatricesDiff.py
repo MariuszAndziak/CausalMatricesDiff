@@ -293,9 +293,14 @@ class CausalMatricesDiff:
         for u, v in false_positives:
             G.add_edge(u, v)  # Add edge for false positives
             red_edges.append((u, v))
+        
+        # Add grey edges for false negatives
+        grey_edges: List[Tuple[str, str]] = []
+        for u, v in false_negatives:
+            grey_edges.append((u, v))  # False negatives are edges in true_dag but not in pred_dag
 
         # Black edges for all other connections
-        black_edges = [edge for edge in G.edges if edge not in red_edges]
+        black_edges = [edge for edge in G.edges if edge not in red_edges + grey_edges]
 
         # If a specific layout is chosen, filter to that layout only
         if layout_num != -1:
@@ -311,8 +316,10 @@ class CausalMatricesDiff:
             )
             # Draw black edges
             nx.draw_networkx_edges(G, pos, edgelist=black_edges, edge_color='black')
-            # Draw red edges with increased width
+            # Draw red edges dor false positives
             nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='red', width=3)
+            # Draw grey edges for false negatives
+            nx.draw_networkx_edges(G, pos, edgelist=grey_edges, edge_color='grey', width=2)
 
             # Add a title for the layout
             if layout_num == -1:
@@ -367,11 +374,11 @@ class CausalMatricesDiff:
             return 100.0 if np.sum(self.pred_dag) == 0 else 0.0
 
         # Calculate the match percentage
-        match_percentage = 100 * matched_edges / total_true_edges
+        match_percentage = float(100 * matched_edges / total_true_edges)
         
         false_positives_len = len(self.list_differences(return_text_description=False)['False Positives'])
         return {
-            'matched paths': match_percentage,
+            'matched paths': round(match_percentage,3),
             'additional paths': false_positives_len
             }
 
