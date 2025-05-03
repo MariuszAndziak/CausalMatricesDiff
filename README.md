@@ -116,5 +116,6 @@ which are not present in True DAG
             Black squares present a match in True DAG and Pred DAG.
             
 
-##### Performing 'calculate_match_percentage' ##### print_step_names=True
+##### Performing 'calculate_match_percentage' ##### 
+{'percent of matched paths [0-1]': 0.9375, 'additional paths': 5}
 ```
