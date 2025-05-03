@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple, Dict, Union
 warnings.filterwarnings("ignore")
 
 
-class CausalMatricesDiff:
+class CompareCausalMatrices:
     """
     Visualize differences between two causal matrices.
     """
@@ -31,12 +31,12 @@ class CausalMatricesDiff:
         """
         self.true_dag: np.ndarray = true_dag
         self.pred_dag: np.ndarray = pred_dag
-        self.fn_list, self.fp_list = self.get_not_equal()
+        self.fn_list, self.fp_list = self.get_all_not_equal()
         self.var_names: List[str] = var_names or [
             f"variable_{n}" for n in range(self.true_dag.shape[0])
         ]
 
-    def get_not_equal(self) -> Tuple[List[List[int]], List[List[int]]]:
+    def get_all_not_equal(self) -> Tuple[List[List[int]], List[List[int]]]:
         """
         Identify false negatives and false positives by comparing the true and predicted DAGs.
 
@@ -198,14 +198,14 @@ class CausalMatricesDiff:
         report = []
 
         if false_negatives == None and false_positives == None:
-            false_positives, false_negatives = self.get_not_equal()
+            false_negatives, false_positives = self.get_all_not_equal()
 
-        report.append("Pred DAG doesn't have causal paths from:")
+        report.append("True DAG has unique causal paths from:")
         for elem in false_negatives:
             report.append(f"- {elem[0]} to {elem[1]}")
-        report.append("which are present in True DAG")
+        report.append("which are not present in Pred DAG")
         report.append("-" * 30)
-        report.append("Pred DAG has additional causal paths from:")
+        report.append("Pred DAG has unique causal paths from:")
         for elem in false_positives:
             report.append(f"- {elem[0]} to {elem[1]}")
         report.append("which are not present in True DAG")
@@ -245,9 +245,9 @@ class CausalMatricesDiff:
                 "False Positives": false_positives_variables,
             }
     
-    def draw_dag(self, layout_num: int = -1) -> None:
+    def draw_dags(self, layout_num: int = -1) -> None:
         """
-        Draws the Directed Acyclic Graph (DAG) with options for different layouts.
+        Draws the Directed Acyclic Graph(s) (DAG) with options for different layouts.
         
         Highlights false positives with red edges and uses black edges for all other connections.
         Allows the user to select a specific layout or visualize the graph using all available layouts.
@@ -378,9 +378,36 @@ class CausalMatricesDiff:
         
         false_positives_len = len(self.list_differences(return_text_description=False)['False Positives'])
         return {
-            'matched paths': round(match_percentage,3),
+            'percent of matched paths [0-1]': round(match_percentage,3)/100,
             'additional paths': false_positives_len
             }
+    
+    def standard_pipeline(self, print_step_names = False):
+        if print_step_names:
+            print("##### Performing 'plot_causal_matrices_diff' ##### ")
+        plt.show(self.plot_causal_matrices_diff(show_legend=True))
+        if print_step_names:
+            print("##### Performing 'format_differences_report' ##### ")
+        print(self.format_differences_report())
+        print('')
+        if print_step_names:
+            print("##### Performing 'list_differences' ##### ")
+        print(self.list_differences())
+        print('')
+        if print_step_names:
+            print("##### Performing 'metrics' ##### ")
+        print(self.metrics())
+        if print_step_names:
+            print("##### Performing 'draw_dags' ##### ")
+        plt.show(self.draw_dags())
+        if print_step_names:
+            print("##### Performing 'legend_description' ##### ")
+        print(self.legend_descriptions())
+        print('')
+        if print_step_names:
+            print("##### Performing 'calculate_match_percentage' ##### ")
+        print(self.calculate_match_percentage())
+
 
 
 

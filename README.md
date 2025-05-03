@@ -49,35 +49,61 @@ pred_dag = np.array(
 
 names = ['Guinness', 'Whiskey', 'Katie', 'Cocoa', 'Harley', 'Scout', 'Chloe', 'Millie', 'Winnie', 'Wrigley']
 
-compare_matrices = CMD(true_dag=true_dag, pred_dag=pred_dag, var_names=names)
-
-compare_matrices.plot_causal_matrices_diff(show_legend=True)
-
-metrics = compare_matrices.metrics()
-
-print(compare_matrices.list_differences())
-print('#'*30)
-print('Structural Hamming Distance:' ,metrics['shd'])
-print(metrics['undir'])
+compare = CCM(true_dag=true_dag, pred_dag=pred_dag, var_names = names)
+compare.standard_pipeline(print_step_names=True)
 ```
+
 
 <p align="center">
   <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example2.png" alt="Show differences in DAG structures">
 </p>
 
 ```
-Pred DAG doesn't have causal paths from:
-- Katie to Millie
-which are present in True DAG
+```bash
+##### Performing 'format_differences_report' ##### 
+True DAG has unique causal paths from:
+- 2 to 7
+which are not present in Pred DAG
 ------------------------------
-Pred DAG has additional causal paths from:
+Pred DAG has unique causal paths from:
+- 0 to 7
+- 1 to 7
+- 2 to 3
+- 3 to 4
+- 3 to 5
+which are not present in True DAG
+
+##### Performing 'list_differences' ##### 
+True DAG has unique causal paths from:
+- Katie to Millie
+which are not present in Pred DAG
+------------------------------
+Pred DAG has unique causal paths from:
 - Guinness to Millie
 - Whiskey to Millie
 - Katie to Cocoa
 - Cocoa to Harley
 - Cocoa to Scout
 which are not present in True DAG
-##############################
-Structural Hamming Distance: 6.0
-{'# of undirected edges for True DAG': 0, '# of undirected edges for Pred DAG': 0}
+
+##### Performing 'metrics' ##### 
+{'shd': 6.0, 'undir': {'# of undirected edges for True DAG': 0, '# of undirected edges for Pred DAG': 0}}
+##### Performing 'draw_dags' ##### 
+```
+```bash
+##### Performing 'legend_description' ##### 
+
+            Red edges are false positives - a path present in Pred DAG but absent in True DAG. 
+
+            Grey edges are false negatives - a path present in True DAG but absent in Pred DAG. 
+
+            Black edges present matching paths in True DAG and Pred DAG.
+            
+
+            White squares represent a connections from variable in on the X axis to variable on Y axis only in True DAG.
+            Grey squares represent a connections from variable in on the X axis to variable on Y axis only in Pred DAG.
+            Black squares present a match in True DAG and Pred DAG.
+            
+
+##### Performing 'calculate_match_percentage' ##### print_step_names=True
 ```
