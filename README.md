@@ -10,7 +10,7 @@ A textual report is also generated, detailing false positive and false negative 
 
 ## **Constructed Implementation** ## 
 <p align="center">
-  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example.png" alt="Show differences in DAG structures">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/example.png" alt="Show differences in DAG structures">
 </p>
 
 ## **Example of usage** ##
@@ -55,10 +55,10 @@ compare.standard_pipeline(print_step_names=True)
 
 
 <p align="center">
-  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/example2.png" alt="Show differences in DAG structures">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/example2.png" alt="Show differences in DAG structures">
 </p>
 
-```
+
 ```bash
 ##### Performing 'format_differences_report' ##### 
 True DAG has unique causal paths from:
@@ -90,6 +90,10 @@ which are not present in True DAG
 {'shd': 6.0, 'undir': {'# of undirected edges for True DAG': 0, '# of undirected edges for Pred DAG': 0}}
 ##### Performing 'draw_dags' ##### 
 ```
+<p align="center">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d0.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d1.png">
+</p>
 ```bash
 ##### Performing 'legend_description' ##### 
 
