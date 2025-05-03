@@ -93,7 +93,14 @@ which are not present in True DAG
 <p align="center">
   <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d0.png">
   <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d1.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d2.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d3.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d4.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d5.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d6.png">
+  <img src="https://github.com/MariuszAndziak/CausalMatricesDiff/blob/main/graphics/d7.png">
 </p>
+
 ```bash
 ##### Performing 'legend_description' ##### 
 
